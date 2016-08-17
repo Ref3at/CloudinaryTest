@@ -89,9 +89,6 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         //   AppEventsLogger.activateApp(getApplication());
 
-
-        //Toast.makeText(this,getCurrentDate(new Date()).substring(9,16),Toast.LENGTH_LONG).show();
-
         // priceUri = Uri.parse("android.resource://com.example.refaat.cloudinarytest/drawable/price.png");;
 
         priceUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE +
