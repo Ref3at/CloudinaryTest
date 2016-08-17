@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     Button addNewItem;
     LinearLayout itemsContainer;
 
-    HashMap<Integer, UiItem> mapItems;
+    HashMap<Integer, UiItem> mapOfItems;
 
     Uri priceUri, ssssUri;
 
@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         cloudinary = new Cloudinary(config);
 
         imagesMap = new HashMap<>();
-        mapItems = new HashMap<>();
+        mapOfItems = new HashMap<>();
         itemsContainer = (LinearLayout) findViewById(R.id.items_container);
 
         addNewItem = (Button) findViewById(R.id.add_new_item);
@@ -138,19 +138,19 @@ public class MainActivity extends AppCompatActivity {
         final UiItem item = new UiItem();
         item.setUniqueNo(Integer.parseInt(getCurrentDate(new Date()).substring(11,16)));
         item.setRootV(rootView);
-        mapItems.put(item.getUniqueNo(),item);
+        mapOfItems.put(item.getUniqueNo(), item);
 
         rootView.findViewById(R.id.delete_item).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                for (final Uploadclass uploadclass : mapItems.get(item.getUniqueNo()).imagesMap.values()) {
+                for (final Uploadclass uploadclass : mapOfItems.get(item.getUniqueNo()).imagesMap.values()) {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 cloudinary.uploader().destroy(uploadclass.getPublic_id(), ObjectUtils.emptyMap());
-                                mapItems.get(item.getUniqueNo()).imagesMap.remove(uploadclass.getUniqueKey());
+                                mapOfItems.get(item.getUniqueNo()).imagesMap.remove(uploadclass.getUniqueKey());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -232,14 +232,14 @@ public class MainActivity extends AppCompatActivity {
         final View rootImage = inflater.inflate(R.layout.image_group, null);
 
         final String key = UUID.randomUUID().toString();
-        final UiItem item = mapItems.get(requestCode);
+        final UiItem item = mapOfItems.get(requestCode);
 
         LinearLayout lytImagesGroupContainer = null;
         ImageButton item_delete_btn = null;
         if (itemsContainer != null) {
-            lytImagesGroupContainer = (LinearLayout) mapItems.get(requestCode).getRootV().findViewById(R.id.imgscontainer);
+            lytImagesGroupContainer = (LinearLayout) mapOfItems.get(requestCode).getRootV().findViewById(R.id.imgscontainer);
             lytImagesGroupContainer.addView(rootImage);
-            item_delete_btn = (ImageButton) mapItems.get(requestCode).getRootV().findViewById(R.id.delete_item);
+            item_delete_btn = (ImageButton) mapOfItems.get(requestCode).getRootV().findViewById(R.id.delete_item);
         }
 
         if (lytImagesGroupContainer.getChildCount() ==4) {
@@ -643,7 +643,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             context.getPackageManager().getPackageInfo("com.facebook.katana", 0);
-            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/830395877018340/"));
+            return new Intent(Intent.ACTION_VIEW, Uri.parse("fb://page/1591626347747816/"));
         } catch (Exception e) {
             return new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/best.android.games4u/"));
         }
