@@ -32,14 +32,10 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -305,6 +301,7 @@ public class MainActivity extends AppCompatActivity {
                                     cloudinary.uploader().destroy(
                                             item.imagesMap.get(key).getPublic_id(), ObjectUtils.emptyMap());
                                 } catch (IOException e) {
+
                                     e.printStackTrace();
                                 }
                             }
@@ -325,9 +322,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     class UiItem {
+        HashMap<String, Uploadclass> imagesMap = new HashMap<>();
         private int uniqueNo;
         private View rootV;
-        HashMap<String,Uploadclass> imagesMap = new HashMap<>();
 
         public int getUniqueNo() {
             return uniqueNo;
@@ -347,16 +344,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     class Uploadclass extends AsyncTask<Void, Void, HashMap> {
-        private String public_id;
-        private String Url;
-        private String uniqueKey;
-
         boolean done, success;
         ImageView imageView, imageViewdone;
         Uri uri;
         SpinKitView progress;
         ImageButton delete_item;
         ImageButton imgdel, imgRefresh;
+        private String public_id;
+        private String Url;
+        private String uniqueKey;
 
         public Uploadclass(Uri imageUri, ImageView imageView, ImageView imgdn, ImageButton del, ImageButton ref, SpinKitView progress, ImageButton deleteItem) {
             this.imageView = imageView;
