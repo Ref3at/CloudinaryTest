@@ -31,10 +31,13 @@ import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
@@ -61,16 +64,20 @@ public class MainActivity extends AppCompatActivity {
     private Uri mFileUri = null;
     private String m_Text = "";
 
-  private int generateUniqueInteger(){
+//  private int generateUniqueInteger(){
+//
+//      ArrayList<Integer> list = new ArrayList<Integer>();
+//      for (int i=1; i<100; i++) {
+//          list.add(new Integer(i));
+//      }
+//      Collections.shuffle(list);
+//         return list.get(15);
+//    }
 
-      ArrayList<Integer> list = new ArrayList<Integer>();
-      for (int i=1; i<100; i++) {
-          list.add(new Integer(i));
-      }
-      Collections.shuffle(list);
-         return list.get(15);
+
+    static public String getCurrentDate(Date date) {
+        return new SimpleDateFormat("yyyyMMddHHmmssSSS", Locale.US).format(date);
     }
-
 
     @Override
     protected void onResume() {
@@ -86,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         //   AppEventsLogger.activateApp(getApplication());
 
+
+        //Toast.makeText(this,getCurrentDate(new Date()).substring(9,16),Toast.LENGTH_LONG).show();
 
         // priceUri = Uri.parse("android.resource://com.example.refaat.cloudinarytest/drawable/price.png");;
 
@@ -134,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         itemsContainer.addView(rootView);
 
         final UiItem item = new UiItem();
-        item.setUniqueNo(generateUniqueInteger());
+        item.setUniqueNo(Integer.parseInt(getCurrentDate(new Date()).substring(11,16)));
         item.setRootV(rootView);
         mapItems.put(item.getUniqueNo(),item);
 
@@ -201,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (initCode) {
+        if (initCode) { // this boolean for passing the requestCode through cropActivity without change
             rc = requestCode;
             initCode = false;
         }
@@ -240,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
             item_delete_btn = (ImageButton) mapItems.get(requestCode).getRootV().findViewById(R.id.delete_item);
         }
 
-        if (lytImagesGroupContainer.getChildCount() == 3) {
+        if (lytImagesGroupContainer.getChildCount() ==4) {
             item.getRootV().findViewById(R.id.add_new_image).setVisibility(View.GONE);
         }
 
