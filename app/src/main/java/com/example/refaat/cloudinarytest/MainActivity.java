@@ -32,17 +32,17 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     static String postID;
     HashMap<String, Image_model> imagesMap;
-    int decreasedValueFormIndex1 = 0;
-    int decreasedValueFormIndex2 = 0;
     // String token = "EAACEdEose0cBAPDGZAFC14yNzU383gAl65o0wIgQysoZCLUSU3Jbad6Hp93KxXnTHJ3SsBWJ2ItZCPw6UFLFpxysIWqOis2nXvIJ2AVhlI1AeYfapp1baIH5AZCW3PoX0NMlJ5XdoXQny4D9BLD7Lgpezbc8KTnT4KUBoqG6IgZDZD";
     Button tags, prep, create, pub, show;
 
@@ -50,22 +50,27 @@ public class MainActivity extends AppCompatActivity {
 
     Button addNewItem;
     LinearLayout itemsContainer;
-    ArrayList<Image_model>[] images_Array = new ArrayList[3];
-    ArrayList<String>[] images_publicIDs_Array = new ArrayList[3];
 
-    ArrayList<Integer> REQUEST_CAMERA = new ArrayList<>();
-    ArrayList<Integer> SELECT_FILE = new ArrayList<>();
+    HashMap<Integer, UiItem> mapItems;
 
-    ArrayList<Uri> list_Uris = new ArrayList<>();
-    HashMap<String, Uploadclass> mapImageUploading;
-    List<String> ids = new ArrayList<>();
     Uri priceUri, ssssUri;
 
     Boolean initCode = true;
     int rc;
-    String gifUrl;
+
     private Uri mFileUri = null;
     private String m_Text = "";
+
+  private int generateUniqueInteger(){
+
+      ArrayList<Integer> list = new ArrayList<Integer>();
+      for (int i=1; i<100; i++) {
+          list.add(new Integer(i));
+      }
+      Collections.shuffle(list);
+         return list.get(15);
+    }
+
 
     @Override
     protected void onResume() {
@@ -105,29 +110,9 @@ public class MainActivity extends AppCompatActivity {
         config.put("api_secret", "vnIDUi3QVRk-a_wnJjFkGDslxvM");
         cloudinary = new Cloudinary(config);
 
-        images_Array[0] = new ArrayList<>();
-        images_Array[1] = new ArrayList<>();
-        images_Array[2] = new ArrayList<>();
-
-        images_publicIDs_Array[0] = new ArrayList<>();
-        images_publicIDs_Array[1] = new ArrayList<>();
-        images_publicIDs_Array[2] = new ArrayList<>();
-
-        REQUEST_CAMERA.add(55);
-        REQUEST_CAMERA.add(66);
-        REQUEST_CAMERA.add(77);
-
-        SELECT_FILE.add(21);
-        SELECT_FILE.add(28);
-        SELECT_FILE.add(35);
-
-        mapImageUploading = new HashMap<>();
-
         imagesMap = new HashMap<>();
-
-
+        mapItems = new HashMap<>();
         itemsContainer = (LinearLayout) findViewById(R.id.items_container);
-
 
         addNewItem = (Button) findViewById(R.id.add_new_item);
         addNewItem.setOnClickListener(new View.OnClickListener() {
@@ -138,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
                 if (itemsContainer.getChildCount() == 3) {
                     addNewItem.setVisibility(View.GONE);
                 }
-
-                tags.setVisibility(View.VISIBLE);
             }
         });
 
@@ -150,46 +133,27 @@ public class MainActivity extends AppCompatActivity {
         final View rootView = inflater.inflate(R.layout.add_offer_item, null);
         itemsContainer.addView(rootView);
 
+        final UiItem item = new UiItem();
+        item.setUniqueNo(generateUniqueInteger());
+        item.setRootV(rootView);
+        mapItems.put(item.getUniqueNo(),item);
 
         rootView.findViewById(R.id.delete_item).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final int position = itemsContainer.indexOfChild(rootView);
-                final List<Image_model> finalDeletedImages = images_Array[position];
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        for (int i = finalDeletedImages.size(); i > 0; i--) {
-                            try {
-                                cloudinary.uploader().destroy(finalDeletedImages.get(i - 1).getPublic_id(), ObjectUtils.emptyMap());
-                                if (finalDeletedImages.size() == 0)
-                                    return;
-                                finalDeletedImages.remove(i - 1);
 
+                for (final Uploadclass uploadclass : mapItems.get(item.getUniqueNo()).imagesMap.values()) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                cloudinary.uploader().destroy(uploadclass.getPublic_id(), ObjectUtils.emptyMap());
+                                mapItems.get(item.getUniqueNo()).imagesMap.remove(uploadclass.getUniqueKey());
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
-                    }
-                }).start();
-                if (images_Array[position].size() != 0) {
-                    if (position == 0) {
-                        images_Array[0] = images_Array[1];
-                        //images_Array[1].clear();
-                        images_Array[1] = images_Array[2];
-                        //images_Array[2].clear();
-
-                        decreasedValueFormIndex1 = 1;
-                        decreasedValueFormIndex2 = 1;
-                    } else if (position == 1) {
-                        images_Array[1] = images_Array[2];
-                        //images_Array[2].clear();
-                        if (decreasedValueFormIndex2 == 0) {
-                            decreasedValueFormIndex2 = 1;
-                        } else {
-                            decreasedValueFormIndex2 = 2;
-                        }
-                    }
+                    }).start();
                 }
                 itemsContainer.removeView(rootView);
                 addNewItem.setVisibility(View.VISIBLE);
@@ -199,11 +163,7 @@ public class MainActivity extends AppCompatActivity {
         rootView.findViewById(R.id.add_new_image).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout imgsContainer = (LinearLayout) rootView.findViewById(R.id.imgscontainer);
-                selectImage(itemsContainer.indexOfChild(rootView));
-                if (imgsContainer.getChildCount() == 3) {
-                    rootView.findViewById(R.id.add_new_image).setVisibility(View.GONE);
-                }
+                selectImage(item.getUniqueNo());
             }
         });
     }
@@ -221,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 if (items[item].equals("إلتقط صوره!")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     intent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, mFileUri);
-                    startActivityForResult(intent, REQUEST_CAMERA.get(i));
+                    startActivityForResult(intent, i);
                 } else if (items[item].equals("إختار صوره")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
@@ -229,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     intent.setType("image/*");
                     startActivityForResult(
                             Intent.createChooser(intent, "إختار صوره"),
-                            SELECT_FILE.get(i));
+                            i);
                 } else if (items[item].equals("إلغاء")) {
                     dialog.dismiss();
                 }
@@ -246,16 +206,14 @@ public class MainActivity extends AppCompatActivity {
             initCode = false;
         }
         if (resultCode == Activity.RESULT_OK) {
+
             if (requestCode != CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-                // inflateNewImage(data.getData(), requestCode);
-                //beginCrop(data.getData());
                 CropImage.activity(data.getData())
                         .setGuidelines(CropImageView.Guidelines.ON)
                         .setActivityTitle("3roodk").setAutoZoomEnabled(true)
                         .setAspectRatio(3, 2)
                         .start(this);
-            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
-                // handleCrop(resultCode, data, rc);
+            } else {
                 CropImage.ActivityResult result = CropImage.getActivityResult(data);
                 Uri resultUri = result.getUri();
                 inflateNewImage(resultUri, rc);
@@ -267,27 +225,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void inflateNewImage(final Uri uri, int requestCode) {
-        final Image_model imageModel = new Image_model();
         initCode = true;
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View rootImage = inflater.inflate(R.layout.image_group, null);
-        final String key = UUID.randomUUID().toString();
-        imageModel.setUniqueId(key);
 
-        final int indexOfItem;
-        if (requestCode < 50) {
-            indexOfItem = (requestCode / 7) - 3;
-        } else {
-            indexOfItem = (requestCode / 11) - 5;
-        }
+        final String key = UUID.randomUUID().toString();
+        final UiItem item = mapItems.get(requestCode);
+
         LinearLayout lytImagesGroupContainer = null;
         ImageButton item_delete_btn = null;
         if (itemsContainer != null) {
-            lytImagesGroupContainer = (LinearLayout) itemsContainer.getChildAt(indexOfItem).findViewById(R.id.imgscontainer);
+            lytImagesGroupContainer = (LinearLayout) mapItems.get(requestCode).getRootV().findViewById(R.id.imgscontainer);
             lytImagesGroupContainer.addView(rootImage);
-            item_delete_btn = (ImageButton) itemsContainer.getChildAt(indexOfItem).findViewById(R.id.delete_item);
-
+            item_delete_btn = (ImageButton) mapItems.get(requestCode).getRootV().findViewById(R.id.delete_item);
         }
+
+        if (lytImagesGroupContainer.getChildCount() == 3) {
+            item.getRootV().findViewById(R.id.add_new_image).setVisibility(View.GONE);
+        }
+
         final ImageView imgOffer = (ImageView) rootImage.findViewById(R.id.theimage);
         Glide.with(this).load(uri).into(imgOffer);
         imgOffer.setAlpha(0.5f);
@@ -300,78 +256,51 @@ public class MainActivity extends AppCompatActivity {
 
 
         final ImageButton finalItem_delete_btn = item_delete_btn;
-        final ImageButton finalItem_delete_btn1 = item_delete_btn;
+
+        final Uploadclass uploadImage =
+                new Uploadclass(uri, imgOffer, imgDone, del_image, img_refresh, progress, item_delete_btn);
+        uploadImage.setUniqueKey(key);
+
+        item.imagesMap.put(key,uploadImage);
+        item.imagesMap.get(key).execute();
+        if (item_delete_btn != null) {
+            item_delete_btn.setVisibility(View.GONE);}
+
         img_refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (finalItem_delete_btn1 != null) {
-                    finalItem_delete_btn1.setVisibility(View.GONE);
+                if (finalItem_delete_btn != null) {
+                    finalItem_delete_btn.setVisibility(View.GONE);
                 }
                 del_image.setVisibility(View.GONE);
                 img_refresh.setVisibility(View.GONE);
-                mapImageUploading.remove(key);
-                mapImageUploading.put(key, new Uploadclass(uri, imgOffer, imgDone, indexOfItem, del_image, img_refresh, progress, finalItem_delete_btn, imageModel));
-                mapImageUploading.get(key).execute();
+                item.imagesMap.remove(key);
+                item.imagesMap.put(key,uploadImage);
+                item.imagesMap.get(key).execute();
                 progress.setVisibility(View.VISIBLE);
-
-
             }
         });
-
-        final Uploadclass uploadclass = new Uploadclass(uri, imgOffer, imgDone, indexOfItem, del_image, img_refresh, progress, item_delete_btn, imageModel);
-        mapImageUploading.put(key, uploadclass);
-        mapImageUploading.get(key).execute();
-        if (item_delete_btn != null) {
-            item_delete_btn.setVisibility(View.GONE);
-        }
-
-        list_Uris.add(uri);
         final LinearLayout fLytImagesGroupContainer = lytImagesGroupContainer;
-        final int fIndexOfItem = indexOfItem;
         del_image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                int indexOfItem = fIndexOfItem;
-
-
-                if (decreasedValueFormIndex1 != 0 && indexOfItem == 1) {
-                    indexOfItem = indexOfItem - decreasedValueFormIndex1;
-                    images_Array[indexOfItem].remove(fLytImagesGroupContainer.indexOfChild(rootImage) - 1);
-
-                    if (images_Array[indexOfItem].size() == 0) {
-                        decreasedValueFormIndex1 = 0;
-                    }
-                } else if (decreasedValueFormIndex2 != 0 && indexOfItem == 2) {
-                    indexOfItem = indexOfItem - decreasedValueFormIndex2;
-                    images_Array[indexOfItem].remove(fLytImagesGroupContainer.indexOfChild(rootImage) - 1);
-
-                    if (images_Array[indexOfItem].size() == 0) {
-                        decreasedValueFormIndex2 = 0;
-                    }
-                }
-
-                Toast.makeText(v.getContext(), "current index of item : " + indexOfItem
-                        , Toast.LENGTH_LONG).show();
-
-                if (!mapImageUploading.get(key).isDone())
-                    if (mapImageUploading.size() != 0) {
-                        mapImageUploading.get(key).cancel(true);
+                if (!item.imagesMap.get(key).isDone())
+                    if (item.imagesMap.size() != 0) {
+                        item.imagesMap.get(key).cancel(true);
                     } else
-
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
                                 try {
                                     cloudinary.uploader().destroy(
-                                            uploadclass.getPubid(), ObjectUtils.emptyMap());
+                                            item.imagesMap.get(key).getPublic_id(), ObjectUtils.emptyMap());
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
                             }
                         }).start();
-
-                mapImageUploading.remove(key);
+                item.imagesMap.remove(key);
                 fLytImagesGroupContainer.findViewById(R.id.add_new_image).setVisibility(View.VISIBLE);
                 fLytImagesGroupContainer.removeView(rootImage);
             }
@@ -386,48 +315,82 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    class UiItem {
+        private int uniqueNo;
+        private View rootV;
+        HashMap<String,Uploadclass> imagesMap = new HashMap<>();
+
+        public int getUniqueNo() {
+            return uniqueNo;
+        }
+
+        public void setUniqueNo(int uniqueNo) {
+            this.uniqueNo = uniqueNo;
+        }
+
+        public View getRootV() {
+            return rootV;
+        }
+
+        public void setRootV(View rootV) {
+            this.rootV = rootV;
+        }
+    }
+
     class Uploadclass extends AsyncTask<Void, Void, HashMap> {
-        String pubid;
-        int x;
+        private String public_id;
+        private String Url;
+        private String uniqueKey;
+
         boolean done, success;
         ImageView imageView, imageViewdone;
         Uri uri;
         SpinKitView progress;
         ImageButton delete_item;
         ImageButton imgdel, imgRefresh;
-        Image_model imageModel;
 
-        private String imageUrl;
-
-
-        public Uploadclass(Uri imageUri, ImageView imageView, ImageView imgdn, int y, ImageButton del, ImageButton ref, SpinKitView progress, ImageButton deleteItem, Image_model image_model) {
+        public Uploadclass(Uri imageUri, ImageView imageView, ImageView imgdn, ImageButton del, ImageButton ref, SpinKitView progress, ImageButton deleteItem) {
             this.imageView = imageView;
             this.imageViewdone = imgdn;
-            this.x = y;
             this.uri = imageUri;
             this.imgdel = del;
             this.imgRefresh = ref;
             this.progress = progress;
             this.delete_item = deleteItem;
-            this.imageModel = image_model;
         }
 
         public boolean isDone() {
             return done;
         }
 
-        public String getURL() {
-            return imageUrl;
+        public String getUniqueKey() {
+            return uniqueKey;
         }
 
-        public String getPubid() {
-            return pubid;
+        public void setUniqueKey(String uniqueKey) {
+            this.uniqueKey = uniqueKey;
+        }
+
+        public String getUrl() {
+            return Url;
+        }
+
+        public void setUrl(String url) {
+            Url = url;
+        }
+
+        public String getPublic_id() {
+            return public_id;
+        }
+
+        public void setPublic_id(String public_id) {
+            this.public_id = public_id;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            imageUrl = null;
+            Url = null;
             success = false;
             done = false;
         }
@@ -439,15 +402,11 @@ public class MainActivity extends AppCompatActivity {
                 uploadResult = (HashMap) cloudinary.uploader().upload(getApplicationContext().getContentResolver()
                         .openInputStream(uri), ObjectUtils.emptyMap());
 
-
-                ids.add((String) uploadResult.get("public_id"));
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
             return uploadResult;
         }
-
 
         @Override
         protected void onPostExecute(HashMap response) {
@@ -456,21 +415,19 @@ public class MainActivity extends AppCompatActivity {
             progress.setVisibility(View.GONE);
             imgdel.setVisibility(View.VISIBLE);
             delete_item.setVisibility(View.VISIBLE);
+
             if (response != null && response.get("url") != null) {
-                imageUrl = (String) response.get("url");
-                pubid = (String) response.get("public_id");
+                Url = (String) response.get("url");
+                public_id = (String) response.get("public_id");
+
                 imageView.setAlpha(1.0f);
                 imageViewdone.setVisibility(View.VISIBLE);
                 imgdel.setVisibility(View.VISIBLE);
                 showMessageToast("تم رفع الصورة");
-                imageModel.setPublic_id(pubid);
-                imageModel.setUrl(imageUrl);
-                images_Array[x].add(imageModel);
-                images_publicIDs_Array[x].add(pubid);
                 done = true;
                 success = true;
             } else {
-                imageUrl = null;
+                Url = null;
                 done = true;
                 success = false;
                 imgRefresh.setVisibility(View.VISIBLE);
