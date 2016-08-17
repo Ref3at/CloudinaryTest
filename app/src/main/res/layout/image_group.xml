@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/img_group"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:id="@+id/theimage"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_centerInParent="true"
+        tools:src="@drawable/add_image"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:id="@+id/img_done"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@android:drawable/checkbox_on_background"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/img_refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@android:drawable/ic_menu_rotate"
+        android:background="#ff0000"
+        android:visibility="invisible"
+        />
+
+    <com.github.ybq.android.spinkit.SpinKitView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progress"
+        style="@style/SpinKitView.FadingCircle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:SpinKit_Color="#fff"
+        android:visibility="gone"/>
+
+    <ImageButton
+        android:id="@+id/delete_img"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="#00ffffff"
+        android:src="@android:drawable/ic_delete"
+        android:visibility="gone"
+        />
+
+
+</RelativeLayout>
