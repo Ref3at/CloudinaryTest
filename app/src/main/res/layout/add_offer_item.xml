@@ -9,7 +9,7 @@
 
         <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="150dp">
+            android:layout_height="170dp">
 
             <LinearLayout
                 android:id="@+id/imgscontainer"
@@ -36,42 +36,63 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="2"
-                android:layout_marginLeft="5dp"
-                android:layout_height="match_parent"
                 android:id="@+id/the_view"
-                android:orientation="horizontal"
-                android:background="@drawable/circle"
-                >
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:text="55%"
-                    android:textStyle="bold"
-                    android:textColor="#fff"
-                    android:textSize="20sp"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:text="55"
-                    android:textStyle="bold"
-                    android:textColor="#fff"
-                    android:textSize="25sp"/>
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:gravity="center_horizontal|center_vertical"
-                    android:text="55"
-                    android:textStyle="bold"
-                    android:textColor="#ffff00"
-                    android:textSize="33sp"/>
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
 
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="2"
+                android:background="@drawable/circle"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+
+                <TextView
+                    android:id="@+id/txtpr"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+
+                    android:textColor="#fff"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/txtA"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_horizontal|center_vertical"
+                        android:textColor="#fff"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <View
+                        android:id="@+id/dash"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/dashed"
+                        android:visibility="gone" />
+
+
+                </RelativeLayout>
+
+
+                <TextView
+                    android:id="@+id/txtb"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal|center_vertical"
+                    android:textColor="#ffff00"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
 
 
             </LinearLayout>
@@ -80,7 +101,7 @@
                 android:id="@+id/input_layout_priceafter"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2">
+                android:layout_weight="1.8">
 
                 <EditText
                     android:id="@+id/input_priceafter"
@@ -90,6 +111,7 @@
                     android:gravity="center"
                     android:hint="price_after_sale"
                     android:inputType="numberDecimal"
+                    android:maxLength="4"
                     android:padding="10dp"
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
@@ -98,7 +120,7 @@
                 android:id="@+id/input_layout_pricebefore"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2">
+                android:layout_weight="1.8">
 
 
                 <EditText
@@ -109,6 +131,7 @@
                     android:gravity="center"
                     android:hint="price_before_sale"
                     android:inputType="numberDecimal"
+                    android:maxLength="4"
                     android:padding="10dp"
                     android:singleLine="true" />
             </android.support.design.widget.TextInputLayout>
@@ -119,10 +142,10 @@
 
     <ImageButton
         android:id="@+id/delete_item"
-        android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00ffffff"
+        android:padding="10dp"
         android:src="@android:drawable/ic_delete" />
 
 </RelativeLayout>

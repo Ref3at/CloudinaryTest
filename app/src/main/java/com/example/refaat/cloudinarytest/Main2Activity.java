@@ -55,7 +55,7 @@ public class Main2Activity extends AppCompatActivity {
             public void onClick(View view) {
                 Bitmap bitmap = ConvertToBitmap(theView);
 
-                img.setImageBitmap(bitmap);
+//                img.setImageBitmap(bitmap);
 
                 upload(bitmap);
 
